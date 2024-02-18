@@ -1,27 +1,26 @@
-import { Request, Response, NextFunction } from "express";
-import ram from "./util/create.js";
+import { log } from "console";
+import { NextFunction, Request, Response } from "express";
 
-interface middleWare {
-  req: Request;
-  res: Response;
-  next: NextFunction;
+interface Config {
+  excludedPaths?: Set<string>;
 }
-type ram = {
-  name: string;
-};
-const Routes = new Map();
 
-function CreateRoute(name: string, value: string) {
-  Routes.set(name, value);
-}
-export default function AutoCache(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const { path } = req;
-  Routes.has(path) ? null : CreateRoute(path, path);
-  console.log(req.path);
-  console.log(Routes);
-  next();
+export class AutoCache {
+  private config: Config;
+
+  constructor(param: Config) {
+    this.config = param;
+  }
+
+
+  CachingMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const { excludedPaths } = this.config;
+    const { path } = req;
+    if (excludedPaths?.has(path)) {
+
+      return next();
+    }
+
+
+  };
 }
